@@ -29,7 +29,10 @@ python3 checker/checker.py
 
 ## Methodology
 
-<!-- TODO (Varun): write 2-3 TRUE lines here: which AI/model produced ai_outputs/diagnoses.json, how it was run, and whether the outputs were edited by hand. -->
+
+- AI outputs in `ai_outputs/diagnoses.json` were generated using <model name> via <how you ran it>.
+- Each case was run with the prompt in `prompts/diagnose_prompt.md`. <Outputs were / were not edited manually.>
+- Human review (Accepted / Edited / Rejected) was done by me and logged in `review/review_log.csv`.
 
 ## Known limitations (work in progress)
 
