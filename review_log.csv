@@ -1,0 +1,31 @@
+case_id,review_status,reviewer_note
+VLAN-01,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+VLAN-02,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+VLAN-03,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+VLAN-04,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+GW-01,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+GW-02,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+GW-03,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+GW-04,Edited,"Edited: The AI correctly noticed an IP configuration issue, but the human review makes the exact fault explicit: the host uses a /16 mask while VLAN 40 is a /24."
+DHCP-01,Edited,"Edited: The low-confidence wording was reasonable, but the reviewer specified that the missing helper or usable local scope must be confirmed before changing configuration."
+DHCP-02,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+DHCP-03,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+DHCP-04,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+DNS-01,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+DNS-02,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+DNS-03,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+DNS-04,Edited,"Edited: The root cause is correct, but confidence was reduced because the output proves a wrong record value rather than a complete end-to-end lookup failure."
+RT-01,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+RT-02,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+RT-03,Rejected,Rejected as a final diagnosis because the route output proves the selected path but does not prove it is suboptimal. The reviewer requested interface metrics and the intended primary-path design.
+RT-04,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+ACL-01,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+ACL-02,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+ACL-03,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+ACL-04,Edited,"Edited: The AI identified zero ACL matches, but it did not establish whether the ACL is applied in the wrong direction or whether the traffic uses another interface."
+NAT-01,Edited,"Edited: The empty NAT table proves no translations exist, but it does not distinguish an ACL mismatch from incorrect inside/outside interface markings."
+NAT-02,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+NAT-03,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+WIFI-01,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+WIFI-02,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.
+WIFI-03,Accepted,Accepted: The diagnosis is supported by a direct show-output observation and gives a safe next verification command.

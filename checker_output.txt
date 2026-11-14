@@ -1,0 +1,6 @@
+DUPLICATE_IP: 172.16.1.1 on Gi0/0 and Gi0/1
+MASK_MISMATCH: VLAN 10 has masks ['255.255.0.0', '255.255.255.0']
+GATEWAY_MISMATCH: PC1 uses 192.168.10.254; expected 192.168.10.1
+INTERFACE_DOWN: Gi0/1 is down/down
+MISSING_VLAN: Fa0/2 references VLAN 50
+MISSING_ROUTE: 10.50.0.0/16 is absent from the routing table
