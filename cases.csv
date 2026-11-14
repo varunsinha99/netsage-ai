@@ -1,0 +1,158 @@
+case_id,symptom,topology_note,show_output,expected_fault,osi_layer,concept_tag,severity
+VLAN-01,PCs in VLAN 10 cannot reach each other,Access ports Fa0/1 and Fa0/2 should be in VLAN 10 on SW1,"SW1#show vlan brief
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Fa0/1, Fa0/2, Fa0/3
+10   USERS                            active    Fa0/10, Fa0/11",Fa0/1 and Fa0/2 are assigned to VLAN 1 instead of VLAN 10,2,VLAN,medium
+VLAN-02,Guest laptop receives an address but cannot access the guest gateway,SW2 Fa0/18 is the guest access port and should use VLAN 30,"SW2#show interfaces fa0/18 switchport
+Name: Fa0/18
+Operational Mode: static access
+Access Mode VLAN: 20 (STAFF)",Guest port Fa0/18 is placed in VLAN 20 instead of VLAN 30,2,VLAN,medium
+VLAN-03,Inter-switch VLAN 40 users lose connectivity across the trunk,VLAN 40 must be carried between SW1 and SW2 on Gi0/1,"SW1#show interfaces trunk
+Port        Mode         Encapsulation  Status        Native vlan
+Gi0/1       on           802.1q         trunking      1
+Port        Vlans allowed on trunk
+Gi0/1       10,20,30",VLAN 40 is missing from the Gi0/1 allowed VLAN list,2,VLAN,high
+VLAN-04,New department devices cannot communicate after a switch reload,Finance uses VLAN 50 and the VLAN must exist in the switch database,"SW1#show vlan brief
+10   USERS                            active
+20   STAFF                            active
+30   GUEST                            active
+40   SERVERS                          active",VLAN 50 is absent from the VLAN table,2,VLAN,medium
+GW-01,Hosts in VLAN 10 can reach local devices but not other networks,VLAN 10 gateway should be 192.168.10.1,"PC1> ipconfig
+IPv4 Address........: 192.168.10.25
+Subnet Mask.........: 255.255.255.0
+Default Gateway.....: 192.168.10.254
+R1#show ip interface brief
+Vlan10  192.168.10.1  YES manual up up","PC1 default gateway is 192.168.10.254, but the VLAN interface is 192.168.10.1",3,Gateway,high
+GW-02,Only one workstation in the subnet cannot leave the LAN,All VLAN 20 clients should use the same gateway,"PC7> ipconfig
+IPv4 Address........: 192.168.20.77
+Subnet Mask.........: 255.255.255.0
+Default Gateway.....: 192.168.30.1
+R1#show ip interface brief
+Vlan20  192.168.20.1  YES manual up up",PC7 has a gateway from VLAN 30 instead of VLAN 20,3,Gateway,medium
+GW-03,VLAN 99 management access fails from the switch,Management SVI is configured on VLAN 99,"SW1#show running-config interface vlan 99
+interface Vlan99
+ ip address 10.99.0.2 255.255.255.0
+ no shutdown
+SW1#show running-config | include ip default-gateway
+ip default-gateway 10.99.0.254",Switch management default gateway is 10.99.0.254 while the router SVI is 10.99.0.1,3,Gateway,medium
+GW-04,Hosts report intermittent off-subnet connectivity after manual addressing,VLAN 40 is 172.16.40.0/24,"Host12> ipconfig
+IPv4 Address........: 172.16.40.12
+Subnet Mask.........: 255.255.0.0
+Default Gateway.....: 172.16.40.1
+R1#show ip interface brief
+Vlan40  172.16.40.1  YES manual up up",Host12 uses a /16 mask instead of the VLAN 40 /24 mask,3,Gateway,medium
+DHCP-01,New clients receive 169.254.x.x addresses,DHCP server is on R1 for VLAN 10; SVI is the relay point,"R1#show running-config interface vlan 10
+interface Vlan10
+ ip address 192.168.10.1 255.255.255.0
+ no ip helper-address
+R1#show ip dhcp pool USERS
+Pool USERS : 0 / 0 / 0
+Network 192.168.10.0 /24",VLAN 10 has no DHCP pool utilization and no helper/working local pool for clients,3,DHCP,high
+DHCP-02,VLAN 20 clients receive addresses from the wrong subnet,DHCP pool should serve 192.168.20.0/24,"R1#show ip dhcp binding
+Bindings from all pools not associated with VRF:
+IP address       Client-ID/              Lease expiration        Type
+192.168.30.41    0100.11aa.22bb.cc       Infinite                Automatic
+R1#show ip dhcp pool STAFF
+Network 192.168.30.0 /24",STAFF DHCP pool is configured for 192.168.30.0/24 instead of 192.168.20.0/24,3,DHCP,high
+DHCP-03,Some clients cannot obtain DHCP leases after adding a switch,The DHCP server is across the routed VLAN boundary,"R1#show running-config interface vlan 30
+interface Vlan30
+ ip address 192.168.30.1 255.255.255.0
+ ip helper-address 10.1.1.20
+R1#show ip route 10.1.1.20
+% Network not in table",The DHCP relay target 10.1.1.20 is unreachable because its route is missing,3,DHCP,high
+DHCP-04,A previously working address pool stops leasing addresses,Pool USERS should have free addresses for new endpoints,"R1#show ip dhcp pool USERS
+Pool USERS :
+Utilization mark (high/low) : 100 / 80
+Subnet size (first/next) : 0 / 0
+Total addresses : 6
+Leased addresses : 6
+Excluded addresses : 0",DHCP pool is exhausted; all six addresses are leased,7,DHCP,medium
+DNS-01,Users can ping 8.8.8.8 but web names do not resolve,Clients use the internal DNS server at 10.10.10.10,"PC1> ipconfig /all
+DNS Servers........: 10.10.10.99
+R1#show ip interface brief
+Vlan10 192.168.10.1 YES manual up up",Clients are configured with 10.10.10.99 instead of the reachable DNS server 10.10.10.10,7,DNS,medium
+DNS-02,Internal server names fail while public names work,Internal zone is hosted by 10.10.10.10,"R1#show running-config | include ip name-server
+ip name-server 8.8.8.8
+ip name-server 1.1.1.1
+R1#show hosts
+Default domain is not set",Router has only public DNS servers and no internal DNS server configured,7,DNS,medium
+DNS-03,DNS lookups time out for every client in VLAN 30,The DNS server is reachable through the core router,"R1#ping 10.10.10.10
+Type escape sequence to abort.
+.....
+Success rate is 0 percent (0/5)
+R1#show ip route 10.10.10.10
+% Network not in table",There is no route from R1 to the DNS server network,3,DNS,high
+DNS-04,Only the hostname of the mail server fails to resolve,DNS record for mail.corp.example should point to 10.20.1.25,"DNS1#show hosts
+Host                      Address      TTL
+www.corp.example          10.20.1.10   300
+mail.corp.example         10.20.1.52   300",The mail DNS record points to 10.20.1.52 instead of 10.20.1.25,7,DNS,low
+RT-01,Branch users cannot reach the data-center network,R1 should have a route to 10.50.0.0/16 via 172.16.1.2,"R1#show ip route 10.50.0.0
+% Network not in table
+R1#show ip route static
+S    0.0.0.0/0 [1/0] via 172.16.1.2",Specific route to 10.50.0.0/16 is missing; only a default route is present,3,Routing,high
+RT-02,A branch subnet is advertised but replies never return,OSPF should advertise 192.168.60.0/24 from R2,"R2#show ip ospf neighbor
+Neighbor ID     Pri   State           Dead Time   Address         Interface
+10.0.0.1          1   FULL/ -         00:00:32    172.16.2.1      Gi0/0
+R2#show ip route ospf
+O    10.0.0.0/30 [110/2] via 172.16.2.1, Gi0/0",OSPF neighbor is up but 192.168.60.0/24 is not being advertised in the routing table,3,Routing,high
+RT-03,Traffic takes the wrong WAN path and performance is poor,Primary path to 172.20.0.0/16 should use 10.0.0.2,"R1#show ip route 172.20.0.0
+Routing entry for 172.20.0.0/16
+Known via ""ospf 1"", distance 110, metric 50
+* 192.0.2.2, via Serial0/1/0",OSPF selects the higher-metric backup path through 192.0.2.2,3,Routing,medium
+RT-04,Router cannot install a static route to the remote LAN,Next hop 172.16.9.2 should be reachable on Gi0/0,"R1(config)#ip route 192.168.90.0 255.255.255.0 172.16.9.2
+%Invalid next hop address (it is this router)
+R1#show ip interface brief
+Gi0/0 172.16.9.2 YES manual up up",Static route uses R1 own interface address as the next hop,3,Routing,medium
+ACL-01,Users cannot reach the HTTPS application server,ACL should allow TCP/443 from 192.168.10.0/24 to 10.60.0.10,"R1#show access-lists 110
+Extended IP access list 110
+ 10 deny tcp 192.168.10.0 0.0.0.255 host 10.60.0.10 eq 443 (12 matches)
+ 20 permit ip any any",ACL explicitly denies the required HTTPS traffic,4,ACL,high
+ACL-02,A new admin subnet cannot SSH to switches,SSH from 10.99.0.0/24 should be permitted on VTY lines,"SW1#show access-lists MGMT
+Standard IP access list MGMT
+ 10 permit 10.98.0.0 0.0.0.255
+SW1#show running-config | section line vty
+ access-class MGMT in",VTY ACL permits 10.98.0.0/24 but not the new 10.99.0.0/24 admin subnet,4,ACL,high
+ACL-03,Internet access works but DNS queries are blocked,Outbound DNS UDP/53 should be allowed,"R1#show access-lists OUTSIDE-IN
+Extended IP access list OUTSIDE-IN
+ 10 permit tcp any any eq 80
+ 20 permit tcp any any eq 443
+ 30 deny ip any any (48 matches)",ACL has no UDP/53 permit and the implicit/final deny drops DNS queries,4,ACL,medium
+ACL-04,One host is unexpectedly able to reach a restricted server,10.70.0.0/24 must not access 10.80.0.0/24,"R1#show access-lists RESTRICT
+Extended IP access list RESTRICT
+ 10 deny ip 10.70.0.0 0.0.0.255 10.80.0.0 0.0.0.255 (0 matches)
+ 20 permit ip any any",The deny rule is applied in the wrong direction/interface or is not matching the actual traffic path,4,ACL,high
+NAT-01,"Inside clients have no Internet access, but the WAN is up",PAT should translate 192.168.10.0/24 out Serial0/0/0,"R1#show ip nat translations
+Pro Inside global      Inside local       Outside local      Outside global
+---  ---               ---                ---                ---
+R1#show ip nat statistics
+Total active translations: 0
+Outside interface: Serial0/0/0
+Inside interface: Vlan10","No translations are created, indicating missing/mismatched NAT configuration or ACL match",3,NAT,high
+NAT-02,Published web server is unreachable from the Internet,Static NAT should map 203.0.113.10 to 10.60.0.10,"R1#show ip nat translations | include 10.60.0.10
+(none)
+R1#show running-config | include ip nat inside source static
+(no output)",Required static NAT mapping for the inside web server is missing,3,NAT,high
+NAT-03,Some outbound sessions fail when many users connect,PAT pool should not be exhausted,"R1#show ip nat statistics
+Total active translations: 512 (max 512)
+Misses: 184
+Outside interfaces: Gi0/1",PAT translation capacity is exhausted,3,NAT,medium
+WIFI-01,Wireless clients associate but cannot obtain an IP address,AP management and client VLANs are bridged to the switch trunk,"AP1#show dot11 associations
+802.11 Client Stations
+MAC Address        IP address      State
+aaaa.bbbb.cccc     -               Associated
+SW1#show interfaces trunk
+Gi0/2 ... Vlans allowed: 10,20
+AP client VLAN: 30",Wireless client VLAN 30 is not allowed on the AP uplink trunk,2,Wireless,high
+WIFI-02,Wi-Fi signal drops when users move around the office,Two APs should provide overlapping 5 GHz coverage without excessive channel overlap,"AP1#show controllers dot11Radio 1/0
+Channel: 36
+Transmit Power: 17 dBm
+AP2#show controllers dot11Radio 1/0
+Channel: 36
+Transmit Power: 17 dBm","Adjacent APs use the same 5 GHz channel, causing co-channel contention",1,Wireless,medium
+WIFI-03,Wireless users connect to the SSID but cannot reach internal applications,SSID CORP should use WPA2-Enterprise and authenticate through the RADIUS server,"WLC#show wlan name CORP
+WLAN Identifier: 10
+Security Policies: WPA2
+AAA Servers: 0.0.0.0
+WLC#show radius summary
+No active RADIUS servers","CORP WLAN has no configured RADIUS server, so enterprise authentication/backend access is incomplete",2,Wireless,high

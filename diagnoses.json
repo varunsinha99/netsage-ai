@@ -1,0 +1,362 @@
+[
+  {
+    "case_id": "VLAN-01",
+    "diagnosis": {
+      "root_cause": "Fa0/1 and Fa0/2 are assigned to VLAN 1 instead of VLAN 10",
+      "confidence": "high",
+      "evidence": "VLAN Name                             Status    Ports",
+      "next_command": "show interfaces status; show interfaces trunk",
+      "fix_steps": [
+        "Assign the access port to the intended VLAN or add the VLAN to the trunk allowed list. Verify with show vlan brief and show interfaces trunk."
+      ]
+    }
+  },
+  {
+    "case_id": "VLAN-02",
+    "diagnosis": {
+      "root_cause": "Guest port Fa0/18 is placed in VLAN 20 instead of VLAN 30",
+      "confidence": "high",
+      "evidence": "Name: Fa0/18",
+      "next_command": "show interfaces status; show interfaces trunk",
+      "fix_steps": [
+        "Assign the access port to the intended VLAN or add the VLAN to the trunk allowed list. Verify with show vlan brief and show interfaces trunk."
+      ]
+    }
+  },
+  {
+    "case_id": "VLAN-03",
+    "diagnosis": {
+      "root_cause": "VLAN 40 is missing from the Gi0/1 allowed VLAN list",
+      "confidence": "high",
+      "evidence": "Port        Mode         Encapsulation  Status        Native vlan",
+      "next_command": "show interfaces status; show interfaces trunk",
+      "fix_steps": [
+        "Assign the access port to the intended VLAN or add the VLAN to the trunk allowed list. Verify with show vlan brief and show interfaces trunk."
+      ]
+    }
+  },
+  {
+    "case_id": "VLAN-04",
+    "diagnosis": {
+      "root_cause": "VLAN 50 is absent from the VLAN table",
+      "confidence": "high",
+      "evidence": "10   USERS                            active",
+      "next_command": "show interfaces status; show interfaces trunk",
+      "fix_steps": [
+        "Assign the access port to the intended VLAN or add the VLAN to the trunk allowed list. Verify with show vlan brief and show interfaces trunk."
+      ]
+    }
+  },
+  {
+    "case_id": "GW-01",
+    "diagnosis": {
+      "root_cause": "PC1 default gateway is 192.168.10.254, but the VLAN interface is 192.168.10.1",
+      "confidence": "high",
+      "evidence": "IPv4 Address........: 192.168.10.25",
+      "next_command": "show running-config interface vlan 10; show ip interface brief",
+      "fix_steps": [
+        "Correct the endpoint or switch default gateway to match the active VLAN interface, then renew the address and test an off-subnet ping."
+      ]
+    }
+  },
+  {
+    "case_id": "GW-02",
+    "diagnosis": {
+      "root_cause": "PC7 has a gateway from VLAN 30 instead of VLAN 20",
+      "confidence": "high",
+      "evidence": "IPv4 Address........: 192.168.20.77",
+      "next_command": "show running-config interface vlan 10; show ip interface brief",
+      "fix_steps": [
+        "Correct the endpoint or switch default gateway to match the active VLAN interface, then renew the address and test an off-subnet ping."
+      ]
+    }
+  },
+  {
+    "case_id": "GW-03",
+    "diagnosis": {
+      "root_cause": "Switch management default gateway is 10.99.0.254 while the router SVI is 10.99.0.1",
+      "confidence": "high",
+      "evidence": "interface Vlan99",
+      "next_command": "show running-config interface vlan 10; show ip interface brief",
+      "fix_steps": [
+        "Correct the endpoint or switch default gateway to match the active VLAN interface, then renew the address and test an off-subnet ping."
+      ]
+    }
+  },
+  {
+    "case_id": "GW-04",
+    "diagnosis": {
+      "root_cause": "Host12 has an incorrect IP configuration for VLAN 40, specifically a subnet mask mismatch.",
+      "confidence": "medium",
+      "evidence": "\"Subnet Mask.........: 255.255.0.0\" conflicts with the VLAN 40 /24 context in the topology note.",
+      "next_command": "show running-config interface vlan 10; show ip interface brief",
+      "fix_steps": [
+        "Correct the endpoint or switch default gateway to match the active VLAN interface, then renew the address and test an off-subnet ping."
+      ]
+    }
+  },
+  {
+    "case_id": "DHCP-01",
+    "diagnosis": {
+      "root_cause": "The DHCP service for VLAN 10 is unavailable or not correctly configured.",
+      "confidence": "low",
+      "evidence": "\"no ip helper-address\" and \"Pool USERS : 0 / 0 / 0\" show that client DHCP requests are not reaching a usable scope.",
+      "next_command": "show ip dhcp pool; show ip dhcp binding; show running-config interface vlan 30",
+      "fix_steps": [
+        "Correct or restore the DHCP scope/relay configuration, verify reachability to the DHCP server, and renew the client lease."
+      ]
+    }
+  },
+  {
+    "case_id": "DHCP-02",
+    "diagnosis": {
+      "root_cause": "STAFF DHCP pool is configured for 192.168.30.0/24 instead of 192.168.20.0/24",
+      "confidence": "high",
+      "evidence": "Bindings from all pools not associated with VRF:",
+      "next_command": "show ip dhcp pool; show ip dhcp binding; show running-config interface vlan 30",
+      "fix_steps": [
+        "Correct or restore the DHCP scope/relay configuration, verify reachability to the DHCP server, and renew the client lease."
+      ]
+    }
+  },
+  {
+    "case_id": "DHCP-03",
+    "diagnosis": {
+      "root_cause": "The DHCP relay target 10.1.1.20 is unreachable because its route is missing",
+      "confidence": "high",
+      "evidence": "interface Vlan30",
+      "next_command": "show ip dhcp pool; show ip dhcp binding; show running-config interface vlan 30",
+      "fix_steps": [
+        "Correct or restore the DHCP scope/relay configuration, verify reachability to the DHCP server, and renew the client lease."
+      ]
+    }
+  },
+  {
+    "case_id": "DHCP-04",
+    "diagnosis": {
+      "root_cause": "DHCP pool is exhausted; all six addresses are leased",
+      "confidence": "high",
+      "evidence": "Pool USERS :",
+      "next_command": "show ip dhcp pool; show ip dhcp binding; show running-config interface vlan 30",
+      "fix_steps": [
+        "Correct or restore the DHCP scope/relay configuration, verify reachability to the DHCP server, and renew the client lease."
+      ]
+    }
+  },
+  {
+    "case_id": "DNS-01",
+    "diagnosis": {
+      "root_cause": "Clients are configured with 10.10.10.99 instead of the reachable DNS server 10.10.10.10",
+      "confidence": "high",
+      "evidence": "DNS Servers........: 10.10.10.99",
+      "next_command": "nslookup mail.corp.example 10.10.10.10; show ip route",
+      "fix_steps": [
+        "Correct the DNS server/record or restore the route to the DNS server. Flush the resolver cache and test with nslookup."
+      ]
+    }
+  },
+  {
+    "case_id": "DNS-02",
+    "diagnosis": {
+      "root_cause": "Router has only public DNS servers and no internal DNS server configured",
+      "confidence": "high",
+      "evidence": "ip name-server 8.8.8.8",
+      "next_command": "nslookup mail.corp.example 10.10.10.10; show ip route",
+      "fix_steps": [
+        "Correct the DNS server/record or restore the route to the DNS server. Flush the resolver cache and test with nslookup."
+      ]
+    }
+  },
+  {
+    "case_id": "DNS-03",
+    "diagnosis": {
+      "root_cause": "There is no route from R1 to the DNS server network",
+      "confidence": "high",
+      "evidence": "Type escape sequence to abort.",
+      "next_command": "nslookup mail.corp.example 10.10.10.10; show ip route",
+      "fix_steps": [
+        "Correct the DNS server/record or restore the route to the DNS server. Flush the resolver cache and test with nslookup."
+      ]
+    }
+  },
+  {
+    "case_id": "DNS-04",
+    "diagnosis": {
+      "root_cause": "The mail hostname resolves to the wrong address in DNS.",
+      "confidence": "high",
+      "evidence": "\"mail.corp.example         10.20.1.52\" is the incorrect record shown in the output.",
+      "next_command": "nslookup mail.corp.example 10.10.10.10; show ip route",
+      "fix_steps": [
+        "Correct the DNS server/record or restore the route to the DNS server. Flush the resolver cache and test with nslookup."
+      ]
+    }
+  },
+  {
+    "case_id": "RT-01",
+    "diagnosis": {
+      "root_cause": "Specific route to 10.50.0.0/16 is missing; only a default route is present",
+      "confidence": "high",
+      "evidence": "% Network not in table",
+      "next_command": "show ip route 10.50.0.0; show ip ospf database",
+      "fix_steps": [
+        "Add or correct the route/advertisement and verify the selected next hop and return path."
+      ]
+    }
+  },
+  {
+    "case_id": "RT-02",
+    "diagnosis": {
+      "root_cause": "OSPF neighbor is up but 192.168.60.0/24 is not being advertised in the routing table",
+      "confidence": "high",
+      "evidence": "Neighbor ID     Pri   State           Dead Time   Address         Interface",
+      "next_command": "show ip route 10.50.0.0; show ip ospf database",
+      "fix_steps": [
+        "Add or correct the route/advertisement and verify the selected next hop and return path."
+      ]
+    }
+  },
+  {
+    "case_id": "RT-03",
+    "diagnosis": {
+      "root_cause": "The routing path to 172.20.0.0/16 is using a WAN route that may be suboptimal.",
+      "confidence": "medium",
+      "evidence": "\"* 192.0.2.2, via Serial0/1/0\" shows the selected next hop, but the output alone does not prove that it is the wrong path.",
+      "next_command": "show ip route 10.50.0.0; show ip ospf database",
+      "fix_steps": [
+        "Add or correct the route/advertisement and verify the selected next hop and return path."
+      ]
+    }
+  },
+  {
+    "case_id": "RT-04",
+    "diagnosis": {
+      "root_cause": "Static route uses R1 own interface address as the next hop",
+      "confidence": "high",
+      "evidence": "%Invalid next hop address (it is this router)",
+      "next_command": "show ip route 10.50.0.0; show ip ospf database",
+      "fix_steps": [
+        "Add or correct the route/advertisement and verify the selected next hop and return path."
+      ]
+    }
+  },
+  {
+    "case_id": "ACL-01",
+    "diagnosis": {
+      "root_cause": "ACL explicitly denies the required HTTPS traffic",
+      "confidence": "high",
+      "evidence": "Extended IP access list 110",
+      "next_command": "show access-lists; show ip interface",
+      "fix_steps": [
+        "Edit the ACL to permit or deny the intended traffic, apply it in the correct direction, and verify counters."
+      ]
+    }
+  },
+  {
+    "case_id": "ACL-02",
+    "diagnosis": {
+      "root_cause": "VTY ACL permits 10.98.0.0/24 but not the new 10.99.0.0/24 admin subnet",
+      "confidence": "high",
+      "evidence": "Standard IP access list MGMT",
+      "next_command": "show access-lists; show ip interface",
+      "fix_steps": [
+        "Edit the ACL to permit or deny the intended traffic, apply it in the correct direction, and verify counters."
+      ]
+    }
+  },
+  {
+    "case_id": "ACL-03",
+    "diagnosis": {
+      "root_cause": "ACL has no UDP/53 permit and the implicit/final deny drops DNS queries",
+      "confidence": "high",
+      "evidence": "Extended IP access list OUTSIDE-IN",
+      "next_command": "show access-lists; show ip interface",
+      "fix_steps": [
+        "Edit the ACL to permit or deny the intended traffic, apply it in the correct direction, and verify counters."
+      ]
+    }
+  },
+  {
+    "case_id": "ACL-04",
+    "diagnosis": {
+      "root_cause": "The restriction ACL is not effectively blocking the restricted traffic.",
+      "confidence": "low",
+      "evidence": "The rule shows \"(0 matches)\", but the supplied output does not identify whether direction, interface, or traffic source is wrong.",
+      "next_command": "show access-lists; show ip interface",
+      "fix_steps": [
+        "Edit the ACL to permit or deny the intended traffic, apply it in the correct direction, and verify counters."
+      ]
+    }
+  },
+  {
+    "case_id": "NAT-01",
+    "diagnosis": {
+      "root_cause": "NAT is not translating the inside clients to the Internet.",
+      "confidence": "medium",
+      "evidence": "\"Total active translations: 0\" and the empty translation table show that no translations are being created.",
+      "next_command": "show ip nat translations verbose; show running-config | include ip nat",
+      "fix_steps": [
+        "Correct the inside/outside interfaces and NAT rule or capacity, then generate traffic and verify translations."
+      ]
+    }
+  },
+  {
+    "case_id": "NAT-02",
+    "diagnosis": {
+      "root_cause": "Required static NAT mapping for the inside web server is missing",
+      "confidence": "high",
+      "evidence": "(none)",
+      "next_command": "show ip nat translations verbose; show running-config | include ip nat",
+      "fix_steps": [
+        "Correct the inside/outside interfaces and NAT rule or capacity, then generate traffic and verify translations."
+      ]
+    }
+  },
+  {
+    "case_id": "NAT-03",
+    "diagnosis": {
+      "root_cause": "PAT translation capacity is exhausted",
+      "confidence": "high",
+      "evidence": "Total active translations: 512 (max 512)",
+      "next_command": "show ip nat translations verbose; show running-config | include ip nat",
+      "fix_steps": [
+        "Correct the inside/outside interfaces and NAT rule or capacity, then generate traffic and verify translations."
+      ]
+    }
+  },
+  {
+    "case_id": "WIFI-01",
+    "diagnosis": {
+      "root_cause": "Wireless client VLAN 30 is not allowed on the AP uplink trunk",
+      "confidence": "high",
+      "evidence": "802.11 Client Stations",
+      "next_command": "show wlan name CORP; show interfaces trunk; show controllers dot11Radio 1/0",
+      "fix_steps": [
+        "Correct the WLAN/VLAN/RADIUS or radio-channel configuration, reconnect a client, and verify association, DHCP, and application access."
+      ]
+    }
+  },
+  {
+    "case_id": "WIFI-02",
+    "diagnosis": {
+      "root_cause": "Adjacent APs use the same 5 GHz channel, causing co-channel contention",
+      "confidence": "high",
+      "evidence": "Channel: 36",
+      "next_command": "show wlan name CORP; show interfaces trunk; show controllers dot11Radio 1/0",
+      "fix_steps": [
+        "Correct the WLAN/VLAN/RADIUS or radio-channel configuration, reconnect a client, and verify association, DHCP, and application access."
+      ]
+    }
+  },
+  {
+    "case_id": "WIFI-03",
+    "diagnosis": {
+      "root_cause": "CORP WLAN has no configured RADIUS server, so enterprise authentication/backend access is incomplete",
+      "confidence": "high",
+      "evidence": "WLAN Identifier: 10",
+      "next_command": "show wlan name CORP; show interfaces trunk; show controllers dot11Radio 1/0",
+      "fix_steps": [
+        "Correct the WLAN/VLAN/RADIUS or radio-channel configuration, reconnect a client, and verify association, DHCP, and application access."
+      ]
+    }
+  }
+]
